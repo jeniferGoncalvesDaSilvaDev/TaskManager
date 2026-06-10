@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Gerenciador de Tarefas Hospitalar"
+version = "1.0.0"
+id = "artifacts/hospital-tasks"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24890
+
+[services.development]
+run = "pnpm --filter @workspace/hospital-tasks run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/hospital-tasks", "run", "build" ]
+publicDir = "artifacts/hospital-tasks/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24890"
+BASE_PATH = "/"
