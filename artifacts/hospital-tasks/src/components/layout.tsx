@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, ListTodo, PlusCircle, Upload, Tags, Menu, X, BellRing } from "lucide-react";
+import { LayoutDashboard, ListTodo, PlusCircle, Upload, Tags, Menu, X, BarChart2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DeadlineBanner } from "./deadline-banner";
 
@@ -10,6 +10,7 @@ const navItems = [
   { href: "/tasks/new", label: "Nova Tarefa", icon: PlusCircle },
   { href: "/import", label: "Importar", icon: Upload },
   { href: "/categories", label: "Categorias", icon: Tags },
+  { href: "/reports", label: "Relatorio", icon: BarChart2 },
 ];
 
 function NavLinks({ onClose }: { onClose?: () => void }) {

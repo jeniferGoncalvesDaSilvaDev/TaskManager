@@ -37,7 +37,6 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 
 function ProgressBar({ value }: { value: number }) {
   const color =
@@ -140,7 +139,7 @@ function TimeField({
       {value ? (
         <div className="space-y-0.5">
           <p className="font-semibold text-sm">
-            {format(new Date(value), "dd/MM/yyyy", { locale: ptBR })}
+            {format(new Date(value), "dd/MM/yyyy")}
           </p>
           <p className="text-xs text-muted-foreground tabular-nums">
             {format(new Date(value), "HH:mm:ss")}

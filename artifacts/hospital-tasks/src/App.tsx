@@ -11,6 +11,7 @@ import TaskDetail from "@/pages/task-detail";
 import TaskNew from "@/pages/task-new";
 import ImportPage from "@/pages/import";
 import Categories from "@/pages/categories";
+import Reports from "@/pages/reports";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ function Router() {
         <Route path="/tasks/:id" component={TaskDetail} />
         <Route path="/import" component={ImportPage} />
         <Route path="/categories" component={Categories} />
+        <Route path="/reports" component={Reports} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
