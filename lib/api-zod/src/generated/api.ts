@@ -26,6 +26,11 @@ export const ListTasksQueryParams = zod.object({
   "search": zod.coerce.string().optional()
 })
 
+export const listTasksResponseProgressMin = 0;
+export const listTasksResponseProgressMax = 100;
+
+
+
 export const ListTasksResponseItem = zod.object({
   "id": zod.number(),
   "title": zod.string(),
@@ -38,6 +43,9 @@ export const ListTasksResponseItem = zod.object({
   "assignee": zod.string().nullish(),
   "dueDate": zod.string().nullish(),
   "sourceType": zod.enum(['manual', 'text', 'pdf', 'spreadsheet', 'audio']).optional(),
+  "progress": zod.number().min(listTasksResponseProgressMin).max(listTasksResponseProgressMax).optional(),
+  "startTime": zod.string().nullish(),
+  "endTime": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string().optional()
 })
@@ -47,6 +55,9 @@ export const ListTasksResponse = zod.array(ListTasksResponseItem)
 /**
  * @summary Create a new task
  */
+
+export const createTaskBodyProgressMin = 0;
+export const createTaskBodyProgressMax = 100;
 
 
 
@@ -58,7 +69,8 @@ export const CreateTaskBody = zod.object({
   "categoryId": zod.number().optional(),
   "assignee": zod.string().optional(),
   "dueDate": zod.string().optional(),
-  "sourceType": zod.enum(['manual', 'text', 'pdf', 'spreadsheet', 'audio']).optional()
+  "sourceType": zod.enum(['manual', 'text', 'pdf', 'spreadsheet', 'audio']).optional(),
+  "progress": zod.number().min(createTaskBodyProgressMin).max(createTaskBodyProgressMax).optional()
 })
 
 
@@ -86,6 +98,11 @@ export const GetTaskStatsResponse = zod.object({
 /**
  * @summary Get recently updated tasks
  */
+export const getRecentTasksResponseProgressMin = 0;
+export const getRecentTasksResponseProgressMax = 100;
+
+
+
 export const GetRecentTasksResponseItem = zod.object({
   "id": zod.number(),
   "title": zod.string(),
@@ -98,6 +115,9 @@ export const GetRecentTasksResponseItem = zod.object({
   "assignee": zod.string().nullish(),
   "dueDate": zod.string().nullish(),
   "sourceType": zod.enum(['manual', 'text', 'pdf', 'spreadsheet', 'audio']).optional(),
+  "progress": zod.number().min(getRecentTasksResponseProgressMin).max(getRecentTasksResponseProgressMax).optional(),
+  "startTime": zod.string().nullish(),
+  "endTime": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string().optional()
 })
@@ -122,6 +142,11 @@ export const GetTaskParams = zod.object({
   "id": zod.coerce.number()
 })
 
+export const getTaskResponseProgressMin = 0;
+export const getTaskResponseProgressMax = 100;
+
+
+
 export const GetTaskResponse = zod.object({
   "id": zod.number(),
   "title": zod.string(),
@@ -134,6 +159,9 @@ export const GetTaskResponse = zod.object({
   "assignee": zod.string().nullish(),
   "dueDate": zod.string().nullish(),
   "sourceType": zod.enum(['manual', 'text', 'pdf', 'spreadsheet', 'audio']).optional(),
+  "progress": zod.number().min(getTaskResponseProgressMin).max(getTaskResponseProgressMax).optional(),
+  "startTime": zod.string().nullish(),
+  "endTime": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string().optional()
 })
@@ -147,6 +175,9 @@ export const UpdateTaskParams = zod.object({
 })
 
 
+export const updateTaskBodyProgressMin = 0;
+export const updateTaskBodyProgressMax = 100;
+
 
 
 export const UpdateTaskBody = zod.object({
@@ -156,8 +187,14 @@ export const UpdateTaskBody = zod.object({
   "status": zod.enum(['pending', 'in_progress', 'done', 'cancelled']).optional(),
   "categoryId": zod.number().nullish(),
   "assignee": zod.string().optional(),
-  "dueDate": zod.string().nullish()
+  "dueDate": zod.string().nullish(),
+  "progress": zod.number().min(updateTaskBodyProgressMin).max(updateTaskBodyProgressMax).optional()
 })
+
+export const updateTaskResponseProgressMin = 0;
+export const updateTaskResponseProgressMax = 100;
+
+
 
 export const UpdateTaskResponse = zod.object({
   "id": zod.number(),
@@ -171,6 +208,9 @@ export const UpdateTaskResponse = zod.object({
   "assignee": zod.string().nullish(),
   "dueDate": zod.string().nullish(),
   "sourceType": zod.enum(['manual', 'text', 'pdf', 'spreadsheet', 'audio']).optional(),
+  "progress": zod.number().min(updateTaskResponseProgressMin).max(updateTaskResponseProgressMax).optional(),
+  "startTime": zod.string().nullish(),
+  "endTime": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string().optional()
 })
@@ -195,6 +235,11 @@ export const UpdateTaskStatusBody = zod.object({
   "status": zod.enum(['pending', 'in_progress', 'done', 'cancelled'])
 })
 
+export const updateTaskStatusResponseProgressMin = 0;
+export const updateTaskStatusResponseProgressMax = 100;
+
+
+
 export const UpdateTaskStatusResponse = zod.object({
   "id": zod.number(),
   "title": zod.string(),
@@ -207,6 +252,9 @@ export const UpdateTaskStatusResponse = zod.object({
   "assignee": zod.string().nullish(),
   "dueDate": zod.string().nullish(),
   "sourceType": zod.enum(['manual', 'text', 'pdf', 'spreadsheet', 'audio']).optional(),
+  "progress": zod.number().min(updateTaskStatusResponseProgressMin).max(updateTaskStatusResponseProgressMax).optional(),
+  "startTime": zod.string().nullish(),
+  "endTime": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string().optional()
 })

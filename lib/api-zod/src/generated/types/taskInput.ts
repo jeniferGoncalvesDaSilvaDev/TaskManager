@@ -19,4 +19,9 @@ export interface TaskInput {
   assignee?: string;
   dueDate?: string;
   sourceType?: TaskInputSourceType;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  progress?: number;
 }

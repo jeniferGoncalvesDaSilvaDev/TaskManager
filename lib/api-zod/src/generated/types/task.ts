@@ -27,6 +27,15 @@ export interface Task {
   /** @nullable */
   dueDate?: string | null;
   sourceType?: TaskSourceType;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  progress?: number;
+  /** @nullable */
+  startTime?: string | null;
+  /** @nullable */
+  endTime?: string | null;
   createdAt: string;
   updatedAt?: string;
 }

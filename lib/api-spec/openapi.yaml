@@ -299,6 +299,14 @@ components:
         sourceType:
           type: string
           enum: [manual, text, pdf, spreadsheet, audio]
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+        startTime:
+          type: ["string", "null"]
+        endTime:
+          type: ["string", "null"]
         createdAt:
           type: string
         updatedAt:
@@ -330,6 +338,10 @@ components:
         sourceType:
           type: string
           enum: [manual, text, pdf, spreadsheet, audio]
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
 
     TaskUpdate:
       type: object
@@ -351,6 +363,10 @@ components:
           type: string
         dueDate:
           type: ["string", "null"]
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
 
     StatusUpdate:
       type: object

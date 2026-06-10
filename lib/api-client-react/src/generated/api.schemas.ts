@@ -58,6 +58,15 @@ export interface Task {
   /** @nullable */
   dueDate?: string | null;
   sourceType?: TaskSourceType;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  progress?: number;
+  /** @nullable */
+  startTime?: string | null;
+  /** @nullable */
+  endTime?: string | null;
   createdAt: string;
   updatedAt?: string;
 }
@@ -103,6 +112,11 @@ export interface TaskInput {
   assignee?: string;
   dueDate?: string;
   sourceType?: TaskInputSourceType;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  progress?: number;
 }
 
 export type TaskUpdatePriority = typeof TaskUpdatePriority[keyof typeof TaskUpdatePriority];
@@ -136,6 +150,11 @@ export interface TaskUpdate {
   assignee?: string;
   /** @nullable */
   dueDate?: string | null;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  progress?: number;
 }
 
 export type StatusUpdateStatus = typeof StatusUpdateStatus[keyof typeof StatusUpdateStatus];

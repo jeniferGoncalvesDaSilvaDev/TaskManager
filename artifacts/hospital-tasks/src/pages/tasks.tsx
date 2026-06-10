@@ -20,6 +20,33 @@ import { Button } from "@/components/ui/button";
 import { Search, PlusCircle, Filter, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 
+function MiniProgressBar({ value }: { value: number }) {
+  const color =
+    value === 100
+      ? "bg-green-500"
+      : value >= 66
+      ? "bg-blue-500"
+      : value >= 33
+      ? "bg-amber-500"
+      : value > 0
+      ? "bg-red-400"
+      : "bg-muted-foreground/20";
+
+  return (
+    <div className="flex items-center gap-2 mt-1.5">
+      <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-300 ${color}`}
+          style={{ width: `${value}%` }}
+        />
+      </div>
+      <span className="text-xs tabular-nums text-muted-foreground font-medium w-8 text-right">
+        {value}%
+      </span>
+    </div>
+  );
+}
+
 export default function TasksList() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
@@ -56,7 +83,7 @@ export default function TasksList() {
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">Lista de Tarefas</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Organizadas pela urgência da triagem.
+            Organizadas pela urgencia da triagem.
           </p>
         </div>
         <Button asChild className="h-11 px-6 w-full sm:w-auto">
@@ -103,9 +130,7 @@ export default function TasksList() {
             <SelectContent>
               <SelectItem value="all">Todos Status</SelectItem>
               {Object.entries(STATUS_LABELS).map(([k, v]) => (
-                <SelectItem key={k} value={k}>
-                  {v}
-                </SelectItem>
+                <SelectItem key={k} value={k}>{v}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -117,9 +142,7 @@ export default function TasksList() {
             <SelectContent>
               <SelectItem value="all">Toda Prioridade</SelectItem>
               {Object.entries(PRIORITY_LABELS).map(([k, v]) => (
-                <SelectItem key={k} value={k}>
-                  {v}
-                </SelectItem>
+                <SelectItem key={k} value={k}>{v}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -131,21 +154,14 @@ export default function TasksList() {
             <SelectContent>
               <SelectItem value="all">Toda Categoria</SelectItem>
               {categories?.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id.toString()}>
-                  {cat.name}
-                </SelectItem>
+                <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
               ))}
             </SelectContent>
           </Select>
 
           {hasFilters && (
             <button
-              onClick={() => {
-                setSearch("");
-                setStatus("all");
-                setPriority("all");
-                setCategory("all");
-              }}
+              onClick={() => { setSearch(""); setStatus("all"); setPriority("all"); setCategory("all"); }}
               className="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors self-center"
             >
               Limpar filtros
@@ -157,7 +173,7 @@ export default function TasksList() {
       {isLoading ? (
         <div className="space-y-3 animate-pulse">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 bg-card rounded-xl border" />
+            <div key={i} className="h-28 bg-card rounded-xl border" />
           ))}
         </div>
       ) : tasks?.length === 0 ? (
@@ -172,79 +188,83 @@ export default function TasksList() {
         </div>
       ) : (
         <div className="space-y-3">
-          {tasks?.map((task) => (
-            <div
-              key={task.id}
-              className="group bg-card rounded-xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:shadow-md transition-all"
-            >
-              <div className="flex items-start gap-3 flex-1 min-w-0">
-                <div
-                  className={`mt-1 w-4 h-4 rounded-full flex-shrink-0 ring-4 ring-background ${
-                    task.priority === "critical"
-                      ? "bg-red-500"
-                      : task.priority === "high"
-                      ? "bg-orange-500"
-                      : task.priority === "medium"
-                      ? "bg-amber-500"
-                      : "bg-emerald-500"
-                  }`}
-                />
-                <div className="min-w-0 space-y-1.5">
-                  <Link
-                    href={`/tasks/${task.id}`}
-                    className="text-base md:text-lg font-bold hover:underline line-clamp-1 block"
-                  >
-                    {task.title}
-                  </Link>
-                  <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                    <span
-                      className={`px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider border ${PRIORITY_COLORS[task.priority].bg} ${PRIORITY_COLORS[task.priority].text} ${PRIORITY_COLORS[task.priority].border}`}
+          {tasks?.map((task) => {
+            const progress = task.progress ?? 0;
+            return (
+              <div
+                key={task.id}
+                className="group bg-card rounded-xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:shadow-md transition-all"
+              >
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <div
+                    className={`mt-1 w-4 h-4 rounded-full flex-shrink-0 ring-4 ring-background ${
+                      task.priority === "critical"
+                        ? "bg-red-500"
+                        : task.priority === "high"
+                        ? "bg-orange-500"
+                        : task.priority === "medium"
+                        ? "bg-amber-500"
+                        : "bg-emerald-500"
+                    }`}
+                  />
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <Link
+                      href={`/tasks/${task.id}`}
+                      className="text-base md:text-lg font-bold hover:underline line-clamp-1 block"
                     >
-                      {PRIORITY_LABELS[task.priority]}
-                    </span>
-                    <span
-                      className={`px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider ${STATUS_COLORS[task.status].bg} ${STATUS_COLORS[task.status].text}`}
-                    >
-                      {STATUS_LABELS[task.status]}
-                    </span>
-                    {task.categoryName && (
-                      <span className="flex items-center gap-1.5 bg-secondary px-2 py-0.5 rounded-md text-xs font-medium text-secondary-foreground">
-                        <div
-                          className="w-2 h-2 rounded-full"
-                          style={{ backgroundColor: task.categoryColor || "#ccc" }}
-                        />
-                        {task.categoryName}
+                      {task.title}
+                    </Link>
+                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                      <span
+                        className={`px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider border ${PRIORITY_COLORS[task.priority].bg} ${PRIORITY_COLORS[task.priority].text} ${PRIORITY_COLORS[task.priority].border}`}
+                      >
+                        {PRIORITY_LABELS[task.priority]}
                       </span>
-                    )}
-                    {task.dueDate && (
-                      <span className="text-xs">
-                        Vence: {format(new Date(task.dueDate), "dd/MM/yyyy")}
+                      <span
+                        className={`px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider ${STATUS_COLORS[task.status].bg} ${STATUS_COLORS[task.status].text}`}
+                      >
+                        {STATUS_LABELS[task.status]}
                       </span>
-                    )}
+                      {task.categoryName && (
+                        <span className="flex items-center gap-1.5 bg-secondary px-2 py-0.5 rounded-md text-xs font-medium text-secondary-foreground">
+                          <div
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: task.categoryColor || "#ccc" }}
+                          />
+                          {task.categoryName}
+                        </span>
+                      )}
+                      {task.dueDate && (
+                        <span className="text-xs">
+                          Vence: {format(new Date(task.dueDate), "dd/MM/yyyy")}
+                        </span>
+                      )}
+                    </div>
+                    <MiniProgressBar value={progress} />
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                {task.status !== "done" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 sm:flex-none border-green-200 text-green-700 hover:bg-green-50 dark:border-green-900/50 dark:text-green-400 dark:hover:bg-green-900/20"
-                    onClick={() =>
-                      updateStatus.mutate({ id: task.id, data: { status: "done" } })
-                    }
-                    disabled={updateStatus.isPending}
-                  >
-                    Concluir
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  {task.status !== "done" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 sm:flex-none border-green-200 text-green-700 hover:bg-green-50 dark:border-green-900/50 dark:text-green-400 dark:hover:bg-green-900/20"
+                      onClick={() =>
+                        updateStatus.mutate({ id: task.id, data: { status: "done" } })
+                      }
+                      disabled={updateStatus.isPending}
+                    >
+                      Concluir
+                    </Button>
+                  )}
+                  <Button variant="secondary" size="sm" className="flex-1 sm:flex-none" asChild>
+                    <Link href={`/tasks/${task.id}`}>Ver</Link>
                   </Button>
-                )}
-                <Button variant="secondary" size="sm" className="flex-1 sm:flex-none" asChild>
-                  <Link href={`/tasks/${task.id}`}>Ver</Link>
-                </Button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

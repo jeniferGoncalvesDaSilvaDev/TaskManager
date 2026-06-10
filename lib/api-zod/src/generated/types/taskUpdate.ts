@@ -19,4 +19,9 @@ export interface TaskUpdate {
   assignee?: string;
   /** @nullable */
   dueDate?: string | null;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  progress?: number;
 }
