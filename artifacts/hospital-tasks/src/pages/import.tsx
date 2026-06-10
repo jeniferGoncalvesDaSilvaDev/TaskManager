@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "wouter";
 import {
   useImportTasks,
   useListCategories,
@@ -21,7 +22,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Upload, FileText, FileAudio, FileSpreadsheet, CheckCircle2 } from "lucide-react";
 import { PRIORITY_LABELS } from "@/lib/triage";
-import { Link } from "wouter";
 
 const SOURCE_TYPES: {
   value: ImportInputSourceType;
@@ -36,6 +36,7 @@ const SOURCE_TYPES: {
 ];
 
 export default function ImportPage() {
+  const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { data: categories } = useListCategories();
@@ -125,8 +126,8 @@ export default function ImportPage() {
             >
               Importar Mais
             </Button>
-            <Button asChild className="w-full sm:w-auto">
-              <Link href="/tasks">Ver Tarefas</Link>
+            <Button className="w-full sm:w-auto" onClick={() => navigate("/tasks")}>
+              Ver Tarefas
             </Button>
           </div>
         </div>

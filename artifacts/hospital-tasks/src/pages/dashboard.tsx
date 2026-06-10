@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Activity, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
@@ -7,6 +7,7 @@ import { useGetTaskStats, useGetRecentTasks } from "@workspace/api-client-react"
 import { PRIORITY_COLORS, PRIORITY_LABELS, STATUS_LABELS } from "@/lib/triage";
 
 export default function Dashboard() {
+  const [, navigate] = useLocation();
   const { data: stats, isLoading: statsLoading } = useGetTaskStats();
   const { data: recentTasks, isLoading: recentLoading } = useGetRecentTasks();
 
@@ -19,11 +20,9 @@ export default function Dashboard() {
             Visão geral do seu pronto-socorro de tarefas.
           </p>
         </div>
-        <Button asChild className="h-11 px-6 w-full sm:w-auto">
-          <Link href="/tasks/new">
-            <PlusCircle className="mr-2 h-5 w-5" />
-            Nova Tarefa
-          </Link>
+        <Button className="h-11 px-6 w-full sm:w-auto" onClick={() => navigate("/tasks/new")}>
+          <PlusCircle className="mr-2 h-5 w-5" />
+          Nova Tarefa
         </Button>
       </div>
 
@@ -142,8 +141,8 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
-                  <Link href={`/tasks/${task.id}`}>Detalhes</Link>
+                <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => navigate(`/tasks/${task.id}`)}>
+                  Detalhes
                 </Button>
               </div>
             ))

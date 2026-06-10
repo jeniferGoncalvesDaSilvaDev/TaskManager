@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, Link, useLocation } from "wouter";
+import { useParams, useLocation } from "wouter";
 import {
   useGetTask,
   getGetTaskQueryKey,
@@ -241,8 +241,8 @@ export default function TaskDetail() {
     return (
       <div className="text-center py-20 space-y-3">
         <p className="text-lg font-semibold">Tarefa nao encontrada.</p>
-        <Button asChild variant="outline">
-          <Link href="/tasks">Voltar para Lista</Link>
+        <Button variant="outline" onClick={() => setLocation("/tasks")}>
+          Voltar para Lista
         </Button>
       </div>
     );
@@ -253,10 +253,8 @@ export default function TaskDetail() {
   return (
     <div className="space-y-5 pb-12">
       <div className="flex items-center justify-between gap-2">
-        <Button variant="ghost" size="icon" asChild className="rounded-full flex-shrink-0">
-          <Link href="/tasks">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
+        <Button variant="ghost" size="icon" className="rounded-full flex-shrink-0" onClick={() => setLocation("/tasks")}>
+          <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="flex gap-2 flex-wrap justify-end">
           {!isEditing ? (

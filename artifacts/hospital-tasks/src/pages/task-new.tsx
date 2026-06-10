@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, Link } from "wouter";
+import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -86,10 +86,8 @@ export default function TaskNew() {
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-12">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" asChild className="rounded-full flex-shrink-0">
-          <Link href="/tasks">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
+        <Button variant="ghost" size="icon" className="rounded-full flex-shrink-0" onClick={() => setLocation("/tasks")}>
+          <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">Nova Tarefa</h1>

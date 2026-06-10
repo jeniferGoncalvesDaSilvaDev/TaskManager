@@ -46,6 +46,28 @@ export default defineConfig({
         ]
       : []),
   ],
+  optimizeDeps: {
+    include: [
+      "react",
+      "react-dom",
+      "wouter",
+      "@tanstack/react-query",
+      "date-fns",
+      "lucide-react",
+      "clsx",
+      "tailwind-merge",
+      "class-variance-authority",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-select",
+      "@radix-ui/react-toast",
+      "@radix-ui/react-tooltip",
+      "@radix-ui/react-slot",
+      "@radix-ui/react-label",
+      "react-hook-form",
+      "@hookform/resolvers/zod",
+      "zod",
+    ],
+  },
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),

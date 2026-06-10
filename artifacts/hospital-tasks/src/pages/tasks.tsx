@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import {
   useListTasks,
   getListTasksQueryKey,
@@ -49,6 +49,7 @@ function MiniProgressBar({ value }: { value: number }) {
 
 export default function TasksList() {
   const queryClient = useQueryClient();
+  const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<string>("all");
   const [priority, setPriority] = useState<string>("all");
@@ -86,11 +87,9 @@ export default function TasksList() {
             Organizadas pela urgencia da triagem.
           </p>
         </div>
-        <Button asChild className="h-11 px-6 w-full sm:w-auto">
-          <Link href="/tasks/new">
-            <PlusCircle className="mr-2 h-5 w-5" />
-            Nova Tarefa
-          </Link>
+        <Button className="h-11 px-6 w-full sm:w-auto" onClick={() => navigate("/tasks/new")}>
+          <PlusCircle className="mr-2 h-5 w-5" />
+          Nova Tarefa
         </Button>
       </div>
 
@@ -258,8 +257,8 @@ export default function TasksList() {
                       Concluir
                     </Button>
                   )}
-                  <Button variant="secondary" size="sm" className="flex-1 sm:flex-none" asChild>
-                    <Link href={`/tasks/${task.id}`}>Ver</Link>
+                  <Button variant="secondary" size="sm" className="flex-1 sm:flex-none" onClick={() => navigate(`/tasks/${task.id}`)}>
+                    Ver
                   </Button>
                 </div>
               </div>

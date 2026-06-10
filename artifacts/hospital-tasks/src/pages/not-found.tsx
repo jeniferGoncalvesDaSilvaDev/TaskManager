@@ -1,8 +1,9 @@
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
+  const [, navigate] = useLocation();
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
       <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mb-6">
@@ -12,8 +13,8 @@ export default function NotFound() {
       <p className="text-xl text-muted-foreground mb-8 max-w-md">
         Parece que você se perdeu nos corredores. A página que você está procurando não existe na triagem.
       </p>
-      <Button asChild size="lg" className="h-12 px-8 text-lg">
-        <Link href="/">Voltar ao Painel</Link>
+      <Button size="lg" className="h-12 px-8 text-lg" onClick={() => navigate("/")}>
+        Voltar ao Painel
       </Button>
     </div>
   );
