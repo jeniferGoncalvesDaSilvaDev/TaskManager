@@ -5,7 +5,9 @@
  * Gerenciador de Tarefas - Sistema de Triagem e Atendimento
  * OpenAPI spec version: 0.1.0
  */
+import type { Task } from './task';
 
-export interface HealthStatus {
-  status: string;
+export interface ImportResult {
+  imported: number;
+  tasks: Task[];
 }

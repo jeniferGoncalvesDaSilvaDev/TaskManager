@@ -6,6 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
-}
+export type TaskStatsByPriority = {
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+};

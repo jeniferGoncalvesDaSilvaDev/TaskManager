@@ -6,6 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
-}
+export type TaskStatsByStatus = {
+  pending: number;
+  in_progress: number;
+  done: number;
+  cancelled: number;
+};
