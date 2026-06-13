@@ -174,6 +174,7 @@ export default function TaskDetail() {
 
   const { data: categories } = useListCategories();
 
+  // --- updateTask declarado antes de toggleSubtask para evitar referência antecipada ---
   const updateTask = useUpdateTask({
     mutation: {
       onSuccess: () => {
@@ -220,18 +221,43 @@ export default function TaskDetail() {
     },
   });
 
+  // --- toggleSubtask recalcula o progresso da tarefa pai automaticamente ---
   const toggleSubtask = useUpdateSubtask({
     mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getListSubtasksQueryKey(id) });
+      onSuccess: async (_, variables) => {
+        await queryClient.invalidateQueries({ queryKey: getListSubtasksQueryKey(id) });
+
+        const updated =
+          queryClient.getQueryData<typeof subtasks>(getListSubtasksQueryKey(id)) ?? subtasks;
+
+        const newProgress =
+          updated.length > 0
+            ? Math.round(
+                (updated.filter((s) => s.done).length / updated.length) * 100
+              )
+            : 0;
+
+        updateTask.mutate({ id, data: { progress: newProgress } });
       },
     },
   });
 
   const removeSubtask = useDeleteSubtask({
     mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getListSubtasksQueryKey(id) });
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: getListSubtasksQueryKey(id) });
+
+        const updated =
+          queryClient.getQueryData<typeof subtasks>(getListSubtasksQueryKey(id)) ?? subtasks;
+
+        const newProgress =
+          updated.length > 0
+            ? Math.round(
+                (updated.filter((s) => s.done).length / updated.length) * 100
+              )
+            : 0;
+
+        updateTask.mutate({ id, data: { progress: newProgress } });
       },
     },
   });
@@ -584,17 +610,39 @@ export default function TaskDetail() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="">Sem categoria</SelectItem>
-                      {categories?.map((c) => (
-                        <SelectItem key={c.id} value={c.id.toString()}>
-                          {c.name}
+                      {categories?.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id.toString()}>
+                          {cat.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+
                 <div className="space-y-2">
                   <label className="font-medium text-sm flex items-center gap-2 text-muted-foreground">
-                    <Calendar className="h-4 w-4" /> Vencimento
+                    <Flag className="h-4 w-4" /> Prioridade
+                  </label>
+                  <Select
+                    value={editData.priority as string}
+                    onValueChange={(v) => setEditData({ ...editData, priority: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(PRIORITY_LABELS).map(([key, label]) => (
+                        <SelectItem key={key} value={key}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="font-medium text-sm flex items-center gap-2 text-muted-foreground">
+                    <Calendar className="h-4 w-4" /> Data de Vencimento
                   </label>
                   <Input
                     type="date"
@@ -607,69 +655,49 @@ export default function TaskDetail() {
               <>
                 <div>
                   <span className="text-sm font-medium text-muted-foreground flex items-center gap-2 mb-1">
-                    <Folder className="w-4 h-4" /> Categoria
+                    <Folder className="h-4 w-4" /> Categoria
                   </span>
-                  {task.categoryName ? (
-                    <div className="flex items-center gap-2 font-medium">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: task.categoryColor || "#ccc" }}
-                      />
-                      {task.categoryName}
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground text-sm">Sem categoria</span>
-                  )}
+                  <p className="font-semibold text-sm">
+                    {task.categoryId
+                      ? categories?.find((c) => c.id === task.categoryId)?.name ?? "—"
+                      : "Sem categoria"}
+                  </p>
                 </div>
+
                 <div>
                   <span className="text-sm font-medium text-muted-foreground flex items-center gap-2 mb-1">
-                    <Calendar className="w-4 h-4" /> Vencimento
+                    <Flag className="h-4 w-4" /> Prioridade
                   </span>
-                  <span className="font-medium">
-                    {task.dueDate ? format(new Date(task.dueDate), "dd/MM/yyyy") : "-"}
+                  <span
+                    className={`inline-block px-2 py-0.5 rounded text-xs font-bold uppercase ${PRIORITY_COLORS[task.priority].bg} ${PRIORITY_COLORS[task.priority].text}`}
+                  >
+                    {PRIORITY_LABELS[task.priority]}
                   </span>
                 </div>
+
                 <div>
                   <span className="text-sm font-medium text-muted-foreground flex items-center gap-2 mb-1">
-                    <FileText className="w-4 h-4" /> Origem
+                    <Calendar className="h-4 w-4" /> Data de Vencimento
                   </span>
-                  <span className="font-medium capitalize">{task.sourceType || "manual"}</span>
+                  <p className="font-semibold text-sm">
+                    {task.dueDate
+                      ? format(new Date(task.dueDate), "dd/MM/yyyy")
+                      : "Nao definida"}
+                  </p>
                 </div>
+
                 <div>
                   <span className="text-sm font-medium text-muted-foreground flex items-center gap-2 mb-1">
-                    <Clock4 className="w-4 h-4" /> Criada em
+                    <FileText className="h-4 w-4" /> Criado em
                   </span>
-                  <span className="font-medium text-sm">
-                    {format(new Date(task.createdAt), "dd/MM/yyyy HH:mm")}
-                  </span>
+                  <p className="font-semibold text-sm">
+                    {task.createdAt
+                      ? format(new Date(task.createdAt as string), "dd/MM/yyyy HH:mm")
+                      : "—"}
+                  </p>
                 </div>
               </>
             )}
-          </div>
-
-          {/* Status card */}
-          <div className="bg-card border rounded-2xl p-5 shadow-sm">
-            <h3 className="font-bold text-base border-b pb-2 mb-4">Alterar Status</h3>
-            <div className="grid grid-cols-1 gap-2">
-              {(
-                [
-                  { value: "pending", label: "Pendente", icon: Circle, color: "bg-slate-700 text-white hover:bg-slate-800" },
-                  { value: "in_progress", label: "Em Andamento", icon: Clock, color: "bg-blue-600 text-white hover:bg-blue-700" },
-                  { value: "done", label: "Concluida", icon: CheckCircle2, color: "bg-green-600 text-white hover:bg-green-700" },
-                  { value: "cancelled", label: "Cancelada", icon: XCircle, color: "bg-gray-600 text-white hover:bg-gray-700" },
-                ] as const
-              ).map(({ value, label, icon: Icon, color }) => (
-                <Button
-                  key={value}
-                  variant={task.status === value ? "default" : "outline"}
-                  className={`justify-start ${task.status === value ? color : ""}`}
-                  onClick={() => updateStatus.mutate({ id, data: { status: value } })}
-                  disabled={updateStatus.isPending}
-                >
-                  <Icon className="mr-2 h-4 w-4" /> {label}
-                </Button>
-              ))}
-            </div>
           </div>
         </div>
       </div>
