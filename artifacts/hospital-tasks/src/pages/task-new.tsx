@@ -62,7 +62,11 @@ export default function TaskNew() {
     mutation: {
       onSuccess: (data) => {
         toast({ title: "Tarefa criada", description: "Adicionada à triagem com sucesso." });
-        setLocation(`/tasks/${data.id}`);
+        if (data?.id) {
+          setLocation(`/tasks/${data.id}`);
+        } else {
+          setLocation("/tasks");
+        }
       },
       onError: () => {
         toast({

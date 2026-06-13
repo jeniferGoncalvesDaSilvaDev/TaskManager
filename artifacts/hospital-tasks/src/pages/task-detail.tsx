@@ -160,7 +160,7 @@ export default function TaskDetail() {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
 
-  const { data: task, isLoading } = useGetTask(id, {
+  const { data: task, isLoading, isError } = useGetTask(id, {
     query: { enabled: !!id, queryKey: getGetTaskQueryKey(id) },
   });
 
@@ -233,6 +233,18 @@ export default function TaskDetail() {
         <div className="h-10 w-32 bg-muted rounded" />
         <div className="h-48 bg-card border rounded-2xl" />
         <div className="h-48 bg-card border rounded-2xl" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="text-center py-20 space-y-3">
+        <p className="text-lg font-semibold">Erro ao carregar a tarefa.</p>
+        <p className="text-sm text-muted-foreground">O servidor pode estar indisponível. Tente novamente.</p>
+        <Button variant="outline" onClick={() => setLocation("/tasks")}>
+          Voltar para Lista
+        </Button>
       </div>
     );
   }

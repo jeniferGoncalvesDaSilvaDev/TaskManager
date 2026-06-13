@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "wouter";
+import { useLocation } from "wouter";
 import {
   useListTasks,
   getListTasksQueryKey,
@@ -207,12 +207,13 @@ export default function TasksList() {
                     }`}
                   />
                   <div className="min-w-0 flex-1 space-y-1">
-                    <Link
-                      href={`/tasks/${task.id}`}
-                      className="text-base md:text-lg font-bold hover:underline line-clamp-1 block"
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/tasks/${task.id}`)}
+                      className="text-base md:text-lg font-bold hover:underline line-clamp-1 block text-left w-full"
                     >
                       {task.title}
-                    </Link>
+                    </button>
                     <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                       <span
                         className={`px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider border ${PRIORITY_COLORS[task.priority].bg} ${PRIORITY_COLORS[task.priority].text} ${PRIORITY_COLORS[task.priority].border}`}
