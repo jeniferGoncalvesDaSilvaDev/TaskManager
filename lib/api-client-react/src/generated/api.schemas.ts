@@ -233,6 +233,27 @@ export interface ImportInput {
   defaultCategoryId?: number;
 }
 
+export interface Subtask {
+  id: number;
+  taskId: number;
+  title: string;
+  done: boolean;
+  position: number;
+  createdAt: string;
+}
+
+export interface SubtaskInput {
+  /** @minLength 1 */
+  title: string;
+  position?: number;
+}
+
+export interface SubtaskUpdate {
+  /** @minLength 1 */
+  title?: string;
+  done?: boolean;
+}
+
 export interface ImportResult {
   imported: number;
   tasks: Task[];

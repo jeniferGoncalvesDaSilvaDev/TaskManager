@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { db, tasksTable, categoriesTable, insertTaskSchema } from "@workspace/db";
-import { eq, desc, sql, and, ilike, type SQL } from "drizzle-orm";
+import { db, tasksTable, categoriesTable, subtasksTable, insertTaskSchema } from "@workspace/db";
+import { eq, desc, sql, and, ilike, asc, type SQL } from "drizzle-orm";
 
 const router = Router();
 
@@ -294,6 +294,79 @@ router.delete("/tasks/:id", async (req, res) => {
     res.status(204).end();
   } catch (err) {
     req.log.error({ err }, "Failed to delete task");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ── Subtasks ────────────────────────────────────────────────────────────────
+
+router.get("/tasks/:id/subtasks", async (req, res) => {
+  const taskId = Number(req.params.id);
+  if (isNaN(taskId)) { res.status(400).json({ error: "Invalid id" }); return; }
+  try {
+    const rows = await db
+      .select()
+      .from(subtasksTable)
+      .where(eq(subtasksTable.taskId, taskId))
+      .orderBy(asc(subtasksTable.position), asc(subtasksTable.createdAt));
+    res.json(rows);
+  } catch (err) {
+    req.log.error({ err }, "Failed to list subtasks");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/tasks/:id/subtasks", async (req, res) => {
+  const taskId = Number(req.params.id);
+  if (isNaN(taskId)) { res.status(400).json({ error: "Invalid id" }); return; }
+  const { title, position = 0 } = req.body;
+  if (!title?.trim()) { res.status(400).json({ error: "title is required" }); return; }
+  try {
+    const [subtask] = await db
+      .insert(subtasksTable)
+      .values({ taskId, title: title.trim(), position })
+      .returning();
+    res.status(201).json(subtask);
+  } catch (err) {
+    req.log.error({ err }, "Failed to create subtask");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.patch("/tasks/:id/subtasks/:subtaskId", async (req, res) => {
+  const taskId = Number(req.params.id);
+  const subtaskId = Number(req.params.subtaskId);
+  if (isNaN(taskId) || isNaN(subtaskId)) { res.status(400).json({ error: "Invalid id" }); return; }
+  const { title, done } = req.body;
+  const updates: Record<string, unknown> = {};
+  if (title !== undefined) updates.title = title.trim();
+  if (done !== undefined) updates.done = done;
+  if (!Object.keys(updates).length) { res.status(400).json({ error: "Nothing to update" }); return; }
+  try {
+    const [subtask] = await db
+      .update(subtasksTable)
+      .set(updates)
+      .where(and(eq(subtasksTable.id, subtaskId), eq(subtasksTable.taskId, taskId)))
+      .returning();
+    if (!subtask) { res.status(404).end(); return; }
+    res.json(subtask);
+  } catch (err) {
+    req.log.error({ err }, "Failed to update subtask");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.delete("/tasks/:id/subtasks/:subtaskId", async (req, res) => {
+  const taskId = Number(req.params.id);
+  const subtaskId = Number(req.params.subtaskId);
+  if (isNaN(taskId) || isNaN(subtaskId)) { res.status(400).json({ error: "Invalid id" }); return; }
+  try {
+    await db
+      .delete(subtasksTable)
+      .where(and(eq(subtasksTable.id, subtaskId), eq(subtasksTable.taskId, taskId)));
+    res.status(204).end();
+  } catch (err) {
+    req.log.error({ err }, "Failed to delete subtask");
     res.status(500).json({ error: "Internal server error" });
   }
 });

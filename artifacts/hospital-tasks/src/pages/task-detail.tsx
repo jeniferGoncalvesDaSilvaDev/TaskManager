@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import {
   useGetTask,
@@ -7,6 +7,11 @@ import {
   useDeleteTask,
   useUpdateTaskStatus,
   useListCategories,
+  useListSubtasks,
+  getListSubtasksQueryKey,
+  useCreateSubtask,
+  useUpdateSubtask,
+  useDeleteSubtask,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { PRIORITY_COLORS, PRIORITY_LABELS, STATUS_COLORS, STATUS_LABELS } from "@/lib/triage";
@@ -35,6 +40,9 @@ import {
   Play,
   Flag,
   TrendingUp,
+  CheckSquare,
+  Plus,
+  X,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -194,6 +202,49 @@ export default function TaskDetail() {
   });
 
   const [editData, setEditData] = useState<Record<string, unknown>>({});
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
+  const [isAddingSubtask, setIsAddingSubtask] = useState(false);
+  const addInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: subtasks = [] } = useListSubtasks(id, {
+    query: { enabled: !!id, queryKey: getListSubtasksQueryKey(id) },
+  });
+
+  const addSubtask = useCreateSubtask({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getListSubtasksQueryKey(id) });
+        setNewSubtaskTitle("");
+        addInputRef.current?.focus();
+      },
+    },
+  });
+
+  const toggleSubtask = useUpdateSubtask({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getListSubtasksQueryKey(id) });
+      },
+    },
+  });
+
+  const removeSubtask = useDeleteSubtask({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getListSubtasksQueryKey(id) });
+      },
+    },
+  });
+
+  useEffect(() => {
+    if (isAddingSubtask) addInputRef.current?.focus();
+  }, [isAddingSubtask]);
+
+  function handleAddSubtask() {
+    const title = newSubtaskTitle.trim();
+    if (!title) return;
+    addSubtask.mutate({ id, data: { title, position: subtasks.length } });
+  }
 
   const handleEditClick = () => {
     if (task) {
@@ -352,6 +403,130 @@ export default function TaskDetail() {
               </div>
             )}
           </div>
+
+          {/* Checklist card */}
+          {!isEditing && (
+            <div className="bg-card border rounded-2xl p-5 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-base flex items-center gap-2">
+                  <CheckSquare className="w-4 h-4" /> Checklist
+                  {subtasks.length > 0 && (
+                    <span className="text-xs font-normal text-muted-foreground">
+                      {subtasks.filter((s) => s.done).length}/{subtasks.length}
+                    </span>
+                  )}
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-2 text-xs gap-1"
+                  onClick={() => setIsAddingSubtask((v) => !v)}
+                >
+                  <Plus className="w-3.5 h-3.5" /> Adicionar
+                </Button>
+              </div>
+
+              {subtasks.length > 0 && (
+                <div className="mb-3">
+                  <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-green-500 transition-all duration-300"
+                      style={{
+                        width: `${subtasks.length > 0 ? Math.round((subtasks.filter((s) => s.done).length / subtasks.length) * 100) : 0}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-1">
+                {subtasks.map((s) => (
+                  <div
+                    key={s.id}
+                    className="group flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-secondary/50 transition-colors"
+                  >
+                    <button
+                      type="button"
+                      onClick={() =>
+                        toggleSubtask.mutate({
+                          id,
+                          subtaskId: s.id,
+                          data: { done: !s.done },
+                        })
+                      }
+                      className="flex-shrink-0 text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {s.done ? (
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Circle className="w-4 h-4" />
+                      )}
+                    </button>
+                    <span
+                      className={`flex-1 text-sm ${
+                        s.done ? "line-through text-muted-foreground" : ""
+                      }`}
+                    >
+                      {s.title}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeSubtask.mutate({ id, subtaskId: s.id })}
+                      className="flex-shrink-0 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+
+                {subtasks.length === 0 && !isAddingSubtask && (
+                  <p className="text-sm text-muted-foreground text-center py-3">
+                    Nenhum passo adicionado ainda.
+                  </p>
+                )}
+              </div>
+
+              {isAddingSubtask && (
+                <div className="mt-2 flex gap-2">
+                  <Input
+                    ref={addInputRef}
+                    value={newSubtaskTitle}
+                    onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                    placeholder="Descreva o passo..."
+                    className="h-9 text-sm"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleAddSubtask();
+                      if (e.key === "Escape") {
+                        setIsAddingSubtask(false);
+                        setNewSubtaskTitle("");
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="h-9 px-3"
+                    onClick={handleAddSubtask}
+                    disabled={!newSubtaskTitle.trim() || addSubtask.isPending}
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-9 px-2"
+                    onClick={() => {
+                      setIsAddingSubtask(false);
+                      setNewSubtaskTitle("");
+                    }}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Quick progress update — only in view mode */}
           {!isEditing && (

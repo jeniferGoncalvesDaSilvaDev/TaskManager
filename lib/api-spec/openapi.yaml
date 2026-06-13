@@ -208,6 +208,98 @@ paths:
               schema:
                 $ref: "#/components/schemas/Task"
 
+  /tasks/{id}/subtasks:
+    get:
+      operationId: listSubtasks
+      tags: [tasks]
+      summary: List subtasks for a task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of subtasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Subtask"
+    post:
+      operationId: createSubtask
+      tags: [tasks]
+      summary: Create a subtask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubtaskInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subtask"
+
+  /tasks/{id}/subtasks/{subtaskId}:
+    patch:
+      operationId: updateSubtask
+      tags: [tasks]
+      summary: Update a subtask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: subtaskId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubtaskUpdate"
+      responses:
+        "200":
+          description: Updated subtask
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subtask"
+    delete:
+      operationId: deleteSubtask
+      tags: [tasks]
+      summary: Delete a subtask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: subtaskId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
   /categories:
     get:
       operationId: listCategories
@@ -459,6 +551,49 @@ components:
           enum: [critical, high, medium, low]
         defaultCategoryId:
           type: integer
+
+    Subtask:
+      type: object
+      required:
+        - id
+        - taskId
+        - title
+        - done
+        - position
+        - createdAt
+      properties:
+        id:
+          type: integer
+        taskId:
+          type: integer
+        title:
+          type: string
+        done:
+          type: boolean
+        position:
+          type: integer
+        createdAt:
+          type: string
+
+    SubtaskInput:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+        position:
+          type: integer
+
+    SubtaskUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        done:
+          type: boolean
 
     ImportResult:
       type: object

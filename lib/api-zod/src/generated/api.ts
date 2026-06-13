@@ -261,6 +261,75 @@ export const UpdateTaskStatusResponse = zod.object({
 
 
 /**
+ * @summary List subtasks for a task
+ */
+export const ListSubtasksParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ListSubtasksResponseItem = zod.object({
+  "id": zod.number(),
+  "taskId": zod.number(),
+  "title": zod.string(),
+  "done": zod.boolean(),
+  "position": zod.number(),
+  "createdAt": zod.string()
+})
+export const ListSubtasksResponse = zod.array(ListSubtasksResponseItem)
+
+
+/**
+ * @summary Create a subtask
+ */
+export const CreateSubtaskParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+export const CreateSubtaskBody = zod.object({
+  "title": zod.string().min(1),
+  "position": zod.number().optional()
+})
+
+
+/**
+ * @summary Update a subtask
+ */
+export const UpdateSubtaskParams = zod.object({
+  "id": zod.coerce.number(),
+  "subtaskId": zod.coerce.number()
+})
+
+
+
+
+export const UpdateSubtaskBody = zod.object({
+  "title": zod.string().min(1).optional(),
+  "done": zod.boolean().optional()
+})
+
+export const UpdateSubtaskResponse = zod.object({
+  "id": zod.number(),
+  "taskId": zod.number(),
+  "title": zod.string(),
+  "done": zod.boolean(),
+  "position": zod.number(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a subtask
+ */
+export const DeleteSubtaskParams = zod.object({
+  "id": zod.coerce.number(),
+  "subtaskId": zod.coerce.number()
+})
+
+
+/**
  * @summary List all categories
  */
 export const ListCategoriesResponseItem = zod.object({
