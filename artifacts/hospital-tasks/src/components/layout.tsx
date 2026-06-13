@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { LayoutDashboard, ListTodo, PlusCircle, Upload, Tags, Menu, X, BarChart2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DeadlineBanner } from "./deadline-banner";
+import { ThemeToggle } from "./theme-toggle";
 
 const navItems = [
   { href: "/", label: "Painel", icon: LayoutDashboard },
@@ -56,8 +57,9 @@ function Sidebar() {
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         <NavLinks />
       </nav>
-      <div className="p-4 border-t border-border text-xs text-muted-foreground">
-        Painel de controle pessoal.
+      <div className="p-4 border-t border-border flex items-center justify-between">
+        <span className="text-xs text-muted-foreground">Painel de controle pessoal.</span>
+        <ThemeToggle />
       </div>
     </div>
   );
@@ -72,13 +74,16 @@ function MobileHeader({ onOpen }: { onOpen: () => void }) {
         </div>
         <span className="font-bold text-lg tracking-tight">Triagem</span>
       </Link>
-      <button
-        onClick={onOpen}
-        className="p-2 rounded-md hover:bg-secondary transition-colors"
-        aria-label="Abrir menu"
-      >
-        <Menu className="w-6 h-6" />
-      </button>
+      <div className="flex items-center gap-1">
+        <ThemeToggle />
+        <button
+          onClick={onOpen}
+          className="p-2 rounded-md hover:bg-secondary transition-colors"
+          aria-label="Abrir menu"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+      </div>
     </header>
   );
 }

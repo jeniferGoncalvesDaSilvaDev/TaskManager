@@ -77,7 +77,13 @@ export default function TaskNew() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     createTask.mutate({
       data: {
-        ...values,
+        title: values.title,
+        priority: values.priority,
+        description: values.description?.trim() || undefined,
+        status: values.status,
+        sourceType: values.sourceType,
+        assignee: values.assignee?.trim() || undefined,
+        dueDate: values.dueDate?.trim() || undefined,
         categoryId: values.categoryId ? parseInt(values.categoryId) : undefined,
       },
     });
